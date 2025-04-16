@@ -4,6 +4,15 @@ import { RemovalPolicy } from "aws-cdk-lib";
 
 export class DBStack extends cdk.Stack {
   public readonly casesTable: dynamodb.Table;
+  public readonly usersTable: dynamodb.Table;
+  public readonly tunnelsTable: dynamodb.Table;
+  public readonly sensorsTable: dynamodb.Table;
+  public readonly sensorReadingsTable: dynamodb.Table;
+  public readonly alertsTable: dynamodb.Table;
+  public readonly auditLogsTable: dynamodb.Table;
+  public readonly requestsTable: dynamodb.Table;
+  public readonly countersTable: dynamodb.Table;
+
 
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -18,7 +27,7 @@ export class DBStack extends cdk.Stack {
     });
 
     //Users Table
-    const usersTable = new dynamodb.Table(this, "UsersTable", {
+    this.usersTable = new dynamodb.Table(this, "UsersTable", {
       tableName: "Users",
       partitionKey: { name: "user_id", type: dynamodb.AttributeType.NUMBER },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -26,7 +35,7 @@ export class DBStack extends cdk.Stack {
     });
 
     //Tunnels Table
-    const tunnelsTable = new dynamodb.Table(this, "TunnelsTable", {
+    this.tunnelsTable = new dynamodb.Table(this, "TunnelsTable", {
       tableName: "Tunnels",
       partitionKey: { name: "tunnel_id", type: dynamodb.AttributeType.NUMBER },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -34,7 +43,7 @@ export class DBStack extends cdk.Stack {
     });
 
     //Sensors Table
-    const sensorsTable = new dynamodb.Table(this, "SensorsTable", {
+    this.sensorsTable = new dynamodb.Table(this, "SensorsTable", {
       tableName: "Sensors",
       partitionKey: { name: "sensor_id", type: dynamodb.AttributeType.NUMBER },
       sortKey: { name: "tunnel_id", type: dynamodb.AttributeType.NUMBER },
@@ -43,7 +52,7 @@ export class DBStack extends cdk.Stack {
     });
 
     //SensorReadings Table
-    const sensorReadingsTable = new dynamodb.Table(this, "SensorReadingsTable", {
+    this.sensorReadingsTable = new dynamodb.Table(this, "SensorReadingsTable", {
       tableName: "SensorReadings",
       partitionKey: { name: "sensor_id", type: dynamodb.AttributeType.NUMBER },
       sortKey: { name: "read_at", type: dynamodb.AttributeType.NUMBER }, // Unix timestamp
@@ -52,7 +61,7 @@ export class DBStack extends cdk.Stack {
     });
 
     //Alerts Table
-    const alertsTable = new dynamodb.Table(this, "AlertsTable", {
+    this.alertsTable = new dynamodb.Table(this, "AlertsTable", {
       tableName: "Alerts",
       partitionKey: { name: "alert_id", type: dynamodb.AttributeType.NUMBER },
       sortKey: { name: "created_at", type: dynamodb.AttributeType.NUMBER },
@@ -61,7 +70,7 @@ export class DBStack extends cdk.Stack {
     });
 
     //AuditLogs Table
-    const auditLogsTable = new dynamodb.Table(this, "AuditLogsTable", {
+    this.auditLogsTable = new dynamodb.Table(this, "AuditLogsTable", {
       tableName: "AuditLogs",
       partitionKey: { name: "log_id", type: dynamodb.AttributeType.NUMBER },
       sortKey: { name: "created_at", type: dynamodb.AttributeType.NUMBER },
@@ -70,7 +79,7 @@ export class DBStack extends cdk.Stack {
     });
 
     //Requests Table
-    const requestsTable = new dynamodb.Table(this, "RequestsTable", {
+    this.requestsTable = new dynamodb.Table(this, "RequestsTable", {
       tableName: "Requests",
       partitionKey: { name: "request_id", type: dynamodb.AttributeType.NUMBER },
       sortKey: { name: "created_at", type: dynamodb.AttributeType.NUMBER },
@@ -79,7 +88,7 @@ export class DBStack extends cdk.Stack {
     });
 
     //Counters Table (for auto-incrementing IDs)
-    const countersTable = new dynamodb.Table(this, "CountersTable", {
+    this.countersTable = new dynamodb.Table(this, "CountersTable", {
       tableName: "Counters",
       partitionKey: { name: "counter_id", type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
