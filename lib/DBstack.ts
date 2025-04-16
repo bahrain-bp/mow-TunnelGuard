@@ -10,8 +10,80 @@ export class DBStack extends cdk.Stack {
 
     // Create DynamoDB Table for cases
     this.casesTable = new dynamodb.Table(this, "[ChallengeName]CaseHistory", {
-      partitionKey: { name: "caseID", type: dynamodb.AttributeType.STRING },
+      partitionKey: { 
+        name: "caseID", 
+        type: dynamodb.AttributeType.STRING 
+      },
       removalPolicy: RemovalPolicy.DESTROY, // Ensure table is deleted during stack removal
+    });
+
+    //Users Table
+    const usersTable = new dynamodb.Table(this, "UsersTable", {
+      tableName: "Users",
+      partitionKey: { name: "user_id", type: dynamodb.AttributeType.NUMBER },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
+    //Tunnels Table
+    const tunnelsTable = new dynamodb.Table(this, "TunnelsTable", {
+      tableName: "Tunnels",
+      partitionKey: { name: "tunnel_id", type: dynamodb.AttributeType.NUMBER },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
+    //Sensors Table
+    const sensorsTable = new dynamodb.Table(this, "SensorsTable", {
+      tableName: "Sensors",
+      partitionKey: { name: "sensor_id", type: dynamodb.AttributeType.NUMBER },
+      sortKey: { name: "tunnel_id", type: dynamodb.AttributeType.NUMBER },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
+    //SensorReadings Table
+    const sensorReadingsTable = new dynamodb.Table(this, "SensorReadingsTable", {
+      tableName: "SensorReadings",
+      partitionKey: { name: "sensor_id", type: dynamodb.AttributeType.NUMBER },
+      sortKey: { name: "read_at", type: dynamodb.AttributeType.NUMBER }, // Unix timestamp
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
+    //Alerts Table
+    const alertsTable = new dynamodb.Table(this, "AlertsTable", {
+      tableName: "Alerts",
+      partitionKey: { name: "alert_id", type: dynamodb.AttributeType.NUMBER },
+      sortKey: { name: "created_at", type: dynamodb.AttributeType.NUMBER },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
+    //AuditLogs Table
+    const auditLogsTable = new dynamodb.Table(this, "AuditLogsTable", {
+      tableName: "AuditLogs",
+      partitionKey: { name: "log_id", type: dynamodb.AttributeType.NUMBER },
+      sortKey: { name: "created_at", type: dynamodb.AttributeType.NUMBER },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
+    //Requests Table
+    const requestsTable = new dynamodb.Table(this, "RequestsTable", {
+      tableName: "Requests",
+      partitionKey: { name: "request_id", type: dynamodb.AttributeType.NUMBER },
+      sortKey: { name: "created_at", type: dynamodb.AttributeType.NUMBER },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
+    //Counters Table (for auto-incrementing IDs)
+    const countersTable = new dynamodb.Table(this, "CountersTable", {
+      tableName: "Counters",
+      partitionKey: { name: "counter_id", type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY,
     });
   }
 }
