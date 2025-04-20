@@ -25,7 +25,26 @@
     "@aws-cdk/aws-s3": "^1.36.1",
     "@aws-cdk/aws-s3-deployment": "^1.78.0",
     "aws-cdk-lib": "^2.177.0",
+    "aws-sdk": "^2.1692.0",
     "cdk": "^2.1007.0",
-    "constructs": "^10.4.2"
-  }
+    "constructs": "^10.4.2",
+    "uuid": "^11.1.0"
+  },
+  "description": "```",
+  "main": "jest.config.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bahrain-bp/mow-TunnelGuard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bahrain-bp/mow-TunnelGuard/issues"
+  },
+  "homepage": "https://github.com/bahrain-bp/mow-TunnelGuard#readme"
 }
