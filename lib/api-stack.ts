@@ -2,6 +2,7 @@ import * as cdk from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import { DBStack } from "./DBstack"; // Import DBStack
+import { MyCdkStack } from "./my-cdk-app-stack";
 
 export class APIStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, dbStack: DBStack, props?: cdk.StackProps) {
