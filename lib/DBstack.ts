@@ -1,8 +1,10 @@
 import * as cdk from "aws-cdk-lib";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as cognito from "aws-cdk-lib/aws-cognito";
 import { Duration } from "aws-cdk-lib";
 import { RemovalPolicy } from "aws-cdk-lib";
+import { APIStack } from "./api-stack";
 
 export class DBStack extends cdk.Stack {
   public readonly casesTable: dynamodb.Table;
@@ -14,6 +16,7 @@ export class DBStack extends cdk.Stack {
   public readonly auditLogsTable: dynamodb.Table;
   public readonly requestsTable: dynamodb.Table;
   public readonly countersTable: dynamodb.Table;
+  public readonly userPool: cognito.UserPool;
 
 
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
@@ -117,6 +120,57 @@ export class DBStack extends cdk.Stack {
     this.tunnelsTable.grantReadWriteData(insertTunnels); // Grant permissions to the Lambda function
     this.sensorsTable.grantReadWriteData(insertSensors); // Grant permissions to the Lambda function
     this.sensorReadingsTable.grantReadWriteData(insertSensorReadings); // Grant permissions to the Lambda function
+
+    
+    
+    // Create a Cognito User Pool lambda function to attach to the database
+    const postCognito = new lambda.Function(this, 'postCognito', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      code: lambda.Code.fromAsset('lambda'),
+      handler: 'postCognito.handler',
+      environment: {
+        USERS_TABLE: this.usersTable.tableName, // Pass table name as environment variable
+      },
+    });
+    
+    this.usersTable.grantWriteData(postCognito); // allow writing to DynamoDB
+    
+    // Create a Cognito User Pool
+    const userPool = new cognito.UserPool(this, 'TunnelGuardUserPool', {
+      userPoolName: 'TunnelGuardUserPool',
+      selfSignUpEnabled: true,
+      signInAliases: {
+        email: true, // users can sign in with email
+      },
+      autoVerify: {
+        email: true,
+      },
+      passwordPolicy: {
+        minLength: 8,
+        requireLowercase: true,
+        requireUppercase: true,
+        requireDigits: true,
+        requireSymbols: false,
+      },
+      accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
+
+      
+      lambdaTriggers: {
+        postConfirmation: postCognito, // Attach the Lambda function to the post-confirmation trigger
+      }
+    });
+
+    // Optional: create a User Pool Client
+    const userPoolClient = new cognito.UserPoolClient(this, 'TunnelGuardUserPoolClient', {
+      userPool,
+      generateSecret: false,
+      userPoolClientName: 'TunnelGuardClient',
+      authFlows: {
+        userPassword: true,
+      },
+    });
+
+    
 
   }
 }
