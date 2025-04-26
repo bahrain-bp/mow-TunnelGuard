@@ -2,7 +2,7 @@ import * as cdk from "aws-cdk-lib";
 import { MyCdkStack } from "../lib/my-cdk-app-stack";
 import { DBStack } from "../lib/DBstack"; // Import your DBStack
 import { APIStack } from "../lib/api-stack"; // Import your APIStack
-import { IoTSensorStack } from "../lib/iot-simulation-stack"; // Import the  IoT stack
+import { IoTSensorStack } from "../lib/iot-simulation-stack"; // Import the IoT stack
 
 const app = new cdk.App();
 
@@ -17,5 +17,9 @@ new APIStack(app, "APIStack", dbStack); // Pass the DBStack as the second argume
 // Optionally, you can create your other stacks here if needed
 new MyCdkStack(app, "MyCdkAppStack");
 
-// Create the IoT Sensor Stack
-new IoTSensorStack(app, "IoTSensorStack");
+// Create the IoT Sensor Stack with required table ARNs
+new IoTSensorStack(app, "IoTSensorStack", {
+  tunnelsTableArn: dbStack.tunnelsTable.tableArn,
+  sensorReadingsTableArn: dbStack.sensorReadingsTable.tableArn,
+  alertsTableArn: dbStack.alertsTable.tableArn
+});
