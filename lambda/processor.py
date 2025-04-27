@@ -3,6 +3,7 @@ import boto3
 import os
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb')
@@ -32,7 +33,7 @@ def lambda_handler(event, context):
         # Extract data from event
         sensor_id = event.get("sensor_id")
         tunnel_id = event.get("tunnel_id")
-        water_level = event.get("water_lvl", 0)
+        water_level = float(event.get("water_lvl", 0))  # Ensure it's a float for comparisons
         
         # Validate required fields
         if not sensor_id:
@@ -81,7 +82,7 @@ def store_sensor_reading(sensor_id, timestamp, sensor_reading):
             Item={
                 'sensor_id': sensor_id,
                 'read_at': timestamp,
-                'sensor_reading': sensor_reading
+                'sensor_reading': Decimal(str(sensor_reading))
             }
         )
         print(f"Stored sensor reading: {sensor_id}, {sensor_reading}")
@@ -143,7 +144,7 @@ def create_alert(sensor_id, tunnel_id, sensor_reading, timestamp):
                 'created_at': timestamp,
                 'tunnel_id': tunnel_id,
                 'type': 'HIGH_WATER_LEVEL',
-                'sensor_reading': sensor_reading,
+                'sensor_reading': Decimal(str(sensor_reading)),
                 'sensor_id': sensor_id,
                 'acknowledged': False,
                 'acknowledged_by': None,
