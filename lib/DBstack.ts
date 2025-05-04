@@ -56,6 +56,20 @@ export class DBStack extends cdk.Stack {
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
+    // Add a Global Secondary Index to the Sensors table
+    this.sensorsTable.addGlobalSecondaryIndex({
+      indexName: 'SensorIdIndex',
+      partitionKey: { name: 'sensor_id', type: dynamodb.AttributeType.STRING },
+      projectionType: dynamodb.ProjectionType.ALL,
+    });
+    
+    // Add a Global Secondary Index to the Sensors table
+    this.sensorsTable.addGlobalSecondaryIndex({
+      indexName: 'TunnelIdIndex',
+      partitionKey: { name: 'tunnel_id', type: dynamodb.AttributeType.STRING },
+      projectionType: dynamodb.ProjectionType.ALL,
+    });
+
     //SensorReadings Table
     this.sensorReadingsTable = new dynamodb.Table(this, "SensorReadings", {
       tableName: "SensorReadings",
@@ -91,37 +105,6 @@ export class DBStack extends cdk.Stack {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: RemovalPolicy.DESTROY,
     });
-
-    //Testing Lambdas
-
-    
-    const insertTunnels = new lambda.Function(this, 'insertTunnels', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'insertTunnel.handler',
-      code: lambda.Code.fromAsset('lambda'),
-      timeout: Duration.seconds(10),
-    });
-
-    const insertSensors = new lambda.Function(this, 'insertSensors', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'insertSensor.handler',
-      code: lambda.Code.fromAsset('lambda'),
-      timeout: Duration.seconds(10),
-      
-    });
-
-    const insertSensorReadings = new lambda.Function(this, 'insertSensorReadings', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'insertSensorReading.handler',
-      code: lambda.Code.fromAsset('lambda'),
-      timeout: Duration.seconds(10),
-    });
-
-    this.tunnelsTable.grantReadWriteData(insertTunnels); // Grant permissions to the Lambda function
-    this.sensorsTable.grantReadWriteData(insertSensors); // Grant permissions to the Lambda function
-    this.sensorReadingsTable.grantReadWriteData(insertSensorReadings); // Grant permissions to the Lambda function
-
-    
     
     // Create a Cognito User Pool lambda function to attach to the database
     const postCognito = new lambda.Function(this, 'postCognito', {
