@@ -1,70 +1,91 @@
-# Getting Started with Create React App
+# TunnelGuard - Tunnel Monitoring System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive tunnel monitoring system providing advanced sensor management and intelligent user interfaces for real-time infrastructure safety assessment.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- Role-based access control and authentication
+- Real-time sensor data tracking and visualization
+- Responsive and dynamic UI components
+- Enhanced user experience with interactive design elements
+- Secure system configuration and user management
+- Dark mode toggle integration
+- Interactive map embeds for tunnel locations
+- Guidance display system for traffic officers
+- Operations logging system for administrative actions
+- Hardware impact monitoring for maintenance planning
 
-### `npm start`
+## Getting Started
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Prerequisites
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Node.js (v16 or higher)
+- npm or yarn
+- PostgreSQL database (optional for production environments)
 
-### `npm test`
+### Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd tunnelguard
+   ```
 
-### `npm run build`
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. Set up environment variables:
+   
+   Create a `.env` file in the root directory with the following variables:
+   ```
+   DATABASE_URL=postgresql://username:password@localhost:5432/tunnelguard
+   ```
+   
+   Note: The application uses in-memory storage by default for development. For production, configure the PostgreSQL database.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Database Setup (For Production)
 
-### `npm run eject`
+1. If using PostgreSQL, create a database:
+   ```sql
+   CREATE DATABASE tunnelguard;
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. The application will automatically set up tables on first run when using the DatabaseStorage provider.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. To switch from MemStorage to DatabaseStorage, uncomment the relevant line in `server/storage.ts`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## User Roles
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- **Administrator**: Full system access including user management
+- **Ministry of Works**: Access to tunnel management, maintenance requests
+- **Traffic Department**: Access to barrier control, guidance display systems
+- **Public User**: View-only access to tunnel status and alerts
 
-## Learn More
+## Default Login Credentials
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+| Username | Password | Role |
+|----------|----------|------|
+| admin    | Admin123 | Administrator |
+| ministry | Work123  | Ministry of Works |
+| traffic  | Road123  | Traffic Department |
+| public   | View123  | Public User |
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Development Notes
 
-### Code Splitting
+- The application is built using React with TypeScript for the frontend
+- Bootstrap 5 is used for styling and responsive components
+- Express.js is used for the backend API
+- Authentication is handled through Passport.js
+- Maps are embedded using iframes for tunnel locations
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Known Issues
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Map iframes don't persist when using in-memory storage after app restarts
+- When running the project locally in VS Code, you need to create the `.env` file with DATABASE_URL as mentioned above

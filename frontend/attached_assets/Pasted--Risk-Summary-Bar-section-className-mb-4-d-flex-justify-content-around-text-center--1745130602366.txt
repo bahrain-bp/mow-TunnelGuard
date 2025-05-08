@@ -1,0 +1,69 @@
+  {/* Risk Summary Bar */}
+  <section className="mb-4 d-flex justify-content-around text-center">
+    <div className="p-2 bg-danger text-white rounded w-25">High Risk: {countByRisk("High")}</div>
+    <div className="p-2 bg-warning text-dark rounded w-25">Moderate Risk: {countByRisk("Moderate")}</div>
+    <div className="p-2 bg-success text-white rounded w-25">Low Risk: {countByRisk("Low")}</div>
+  </section>
+
+  {/* System Status */}
+  <section className="d-flex justify-content-between align-items-center mb-4 text-muted small">
+    <span>System Status: AWS Services Operational</span>
+    <span>Last updated: 10 April 2025, 10:35 AM</span>
+  </section>
+
+  {/* All Tunnels Grid */}
+  <section className="mb-5">
+    <h4 className="mb-3">Tunnels</h4>
+    <div className="d-flex justify-content-between mb-3">
+      <input
+        type="text"
+        placeholder="Search Tunnel ID"
+        className="form-control w-50"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <select
+        className="form-select w-25"
+        value={sortKey}
+        onChange={(e) => setSortKey(e.target.value)}
+      >
+        <option value="id">Sort by ID</option>
+        <option value="riskLevel">Sort by Risk</option>
+      </select>
+    </div>
+    <div className="row g-3">
+      {filteredTunnels.map((tunnel) => (
+        <div className="col-md-6 col-lg-4" key={tunnel.id}>
+          <div className="card bg-light h-100">
+            <div className="card-body">
+              <h5 className="card-title">{tunnel.name} – {tunnel.id}</h5>
+              <span className={`badge bg-${getBadgeColor(tunnel.riskLevel)} mb-2`}>
+                {tunnel.riskLevel} Risk
+              </span>
+              <p className="mb-1">Entrance: {tunnel.sensors.entrance}%</p>
+              <p className="mb-1">Center: {tunnel.sensors.center}%</p>
+              <p className="mb-1">Exit: {tunnel.sensors.exit}%</p>
+              <p className="mb-1">Temp: {tunnel.sensors.temperature}°C</p>
+              <p className="mb-1">Humidity: {tunnel.sensors.humidity}%</p>
+              <div className="d-flex gap-2 mt-3">
+                <button className="btn btn-sm btn-outline-primary">Open</button>
+                <button className="btn btn-sm btn-outline-secondary">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {/* Footer */}
+  <footer className="border-top pt-3 text-center small text-muted">
+    <div className="d-flex justify-content-center gap-3 flex-wrap">
+      <span>{new Date().getFullYear()}</span>
+      <span>Tunnelguard</span>
+      <span>Privacy</span>
+      <span>Contact Info</span>
+      <span>Alternative Contact</span>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,218 @@
+import React, { useState } from "react";
+import { BrowserRouter as Router, Link } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+export default function TunnelguardDashboard() {
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notifications = [
+    { message: "Tunnel 1 reported high water level at Sensor 2.", time: "2025-04-10 10:32 AM" },
+    { message: "Tunnel 2 barrier closed due to flood risk.", time: "2025-04-10 09:58 AM" },
+    { message: "Tunnel 3 status changed to Moderate Risk.", time: "2025-04-10 09:15 AM" }
+  ];
+
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState("id");
+
+  const tunnels = [
+    {
+      id: 1,
+      risk: "High",
+      sensors: {
+        entrance: "42%",
+        center: "65%",
+        exit: "30%",
+        environment: { temperature: "28°C", humidity: "75%" }
+      }
+    },
+    {
+      id: 2,
+      risk: "High",
+      sensors: {
+        entrance: "50%",
+        center: "70%",
+        exit: "40%",
+        environment: { temperature: "29°C", humidity: "70%" }
+      }
+    },
+    {
+      id: 3,
+      risk: "Moderate",
+      sensors: {
+        entrance: "38%",
+        center: "55%",
+        exit: "20%",
+        environment: { temperature: "27°C", humidity: "80%" }
+      }
+    },
+    {
+      id: 4,
+      risk: "Low",
+      sensors: {
+        entrance: "20%",
+        center: "25%",
+        exit: "15%",
+        environment: { temperature: "26°C", humidity: "60%" }
+      }
+    },
+    {
+      id: 5,
+      risk: "Moderate",
+      sensors: {
+        entrance: "35%",
+        center: "50%",
+        exit: "33%",
+        environment: { temperature: "30°C", humidity: "78%" }
+      }
+    },
+    {
+      id: 6,
+      risk: "High",
+      sensors: {
+        entrance: "70%",
+        center: "75%",
+        exit: "65%",
+        environment: { temperature: "31°C", humidity: "85%" }
+      }
+    }
+  ];
+
+  const filteredTunnels = tunnels
+    .filter(t => t.id.toString().includes(search))
+    .sort((a, b) => {
+      if (sortKey === "risk") return a.risk.localeCompare(b.risk);
+      return a.id - b.id;
+    });
+
+  return (
+    <Router>
+      <div className="min-vh-100 d-flex flex-column justify-content-between">
+        <header className="bg-light border-bottom py-2 px-3 d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center">
+            <h2 className="h5 fw-bold me-3 mb-0">Tunnelguard</h2>
+            <div className="position-relative ms-2">
+              <button
+                className="btn btn-sm btn-outline-dark p-1 px-2 rounded-circle"
+                type="button"
+                onClick={() => setShowNotifications(prev => !prev)}
+                title="Notifications"
+              >
+                🔔
+              </button>
+              {showNotifications && (
+                <div className="position-absolute bg-white border rounded shadow p-2" style={{ top: '100%', left: 0, zIndex: 1000, width: '300px' }}>
+                  <strong className="d-block mb-2">Recent Notifications</strong>
+                  <ul className="list-unstyled mb-0">
+                    {notifications.map((note, index) => (
+                      <li key={index} className="mb-2">
+                        <div className="fw-bold">{note.message}</div>
+                        <div className="text-muted small">{note.time}</div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+          <nav className="d-flex flex-wrap justify-content-around align-items-center w-100">
+            <Link to="#" className="text-decoration-none small">Alerts</Link>
+            <Link to="#" className="text-decoration-none small fw-bold">Tunnels</Link>
+            <Link to="#" className="text-decoration-none small">Logs</Link>
+            <Link to="#" className="text-decoration-none small">Users</Link>
+            <span className="small fw-semibold">Admin 👤</span>
+          </nav>
+        </header>
+        <main className="p-3 d-flex flex-column gap-4">
+          <section>
+            <h3 className="h6 fw-semibold mb-3 text-danger">⚠️ Immediate Attention Required</h3>
+            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+              {tunnels.filter(t => t.risk === "High").map((tunnel) => (
+                <div key={tunnel.id} className="col">
+                  <div className="border rounded bg-white p-3 h-100 border-danger">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <h4 className="h6 fw-bold mb-0">Tunnel {tunnel.id}</h4>
+                      <span className="badge text-bg-danger">🔴 High Risk</span>
+                    </div>
+                    <p className="mb-1">Entrance Sensor – Water Level: {tunnel.sensors.entrance}</p>
+                    <p className="mb-1">Center Sensor – Water Level: {tunnel.sensors.center}</p>
+                    <p className="mb-1">Exit Sensor – Water Level: {tunnel.sensors.exit}</p>
+                    <p className="mb-1">Environmental Sensor – Temp: {tunnel.sensors.environment.temperature} | Humidity: {tunnel.sensors.environment.humidity}</p>
+                    <div className="mt-3 d-flex align-items-center gap-2">
+                      <label className="form-label me-2 mb-0">Barrier Status:</label>
+                      <button className="btn btn-outline-primary btn-sm">Open</button>
+                      <button className="btn btn-outline-secondary btn-sm">Close</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="d-flex justify-content-around text-center">
+            <div className="p-2 bg-danger text-white rounded w-25">High Risk: 2</div>
+            <div className="p-2 bg-warning text-dark rounded w-25">Moderate Risk: 1</div>
+            <div className="p-2 bg-success text-white rounded w-25">Low Risk: 0</div>
+          </section>
+
+          <section className="d-flex justify-content-between align-items-center">
+            <div className="text-muted small">System Status: AWS Services Operational</div>
+            <div className="text-muted small">Last updated: 10 April 2025, 10:35 AM</div>
+          </section>
+
+          <section>
+            <h3 className="h6 fw-semibold mb-3">Tunnels</h3>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <input
+                type="text"
+                placeholder="Search Tunnel by ID..."
+                className="form-control w-50"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <select
+                className="form-select w-25"
+                value={sortKey}
+                onChange={(e) => setSortKey(e.target.value)}
+              >
+                <option value="id">Sort by ID</option>
+                <option value="risk">Sort by Risk</option>
+              </select>
+            </div>
+            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+              {filteredTunnels.map((tunnel) => (
+                <div key={tunnel.id} className="col">
+                  <div className="border rounded bg-light p-3 h-100">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <h4 className="h6 fw-bold mb-0">Tunnel {tunnel.id}</h4>
+                      <span className={`badge ${tunnel.risk === "High" ? "text-bg-danger" : tunnel.risk === "Moderate" ? "text-bg-warning text-dark" : "text-bg-success"}`}>
+                        {tunnel.risk === "High" ? "🔴 High Risk" : tunnel.risk === "Moderate" ? "🟠 Moderate Risk" : "🟢 Low Risk"}
+                      </span>
+                    </div>
+                    <p className="mb-1">Entrance Sensor – Water Level: {tunnel.sensors.entrance}</p>
+                    <p className="mb-1">Center Sensor – Water Level: {tunnel.sensors.center}</p>
+                    <p className="mb-1">Exit Sensor – Water Level: {tunnel.sensors.exit}</p>
+                    <p className="mb-1">Environmental Sensor – Temp: {tunnel.sensors.environment.temperature} | Humidity: {tunnel.sensors.environment.humidity}</p>
+                    <div className="mt-3 d-flex align-items-center gap-2">
+                      <label className="form-label me-2 mb-0">Barrier Status:</label>
+                      <button className="btn btn-outline-primary btn-sm">Open</button>
+                      <button className="btn btn-outline-secondary btn-sm">Close</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </main>
+
+        <footer className="bg-light border-top py-2 px-3 text-center small">
+          <div className="d-flex justify-content-center gap-3 flex-wrap">
+            <span>{new Date().getFullYear()}</span>
+            <span>Tunnelguard</span>
+            <span>Privacy</span>
+            <span>Contact Info</span>
+            <span>Alternative Contact</span>
+          </div>
+        </footer>
+      </div>
+    </Router>
+  );
+}
