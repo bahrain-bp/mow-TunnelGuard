@@ -5,6 +5,12 @@ const TUNNELS_TABLE = process.env.TUNNELS_TABLE;
 exports.handler = async (event) => {
     const params = {
         TableName: TUNNELS_TABLE,
+        ProjectionExpression: 'tunnel_id, #nm, #loc, #st, last_status_time',
+        ExpressionAttributeNames: {
+            "#nm": "name",
+            "#loc": "location",
+            "#st": "status",
+        } // Specify the attributes you want to retrieve
     };
 
     try {

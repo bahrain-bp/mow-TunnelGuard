@@ -3,7 +3,7 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 const READINGS_TABLE = process.env.READINGS_TABLE;
 
 exports.handler = async (event) => {
-  const sensor_id = event.pathParameters?.sensorId;
+  const sensor_id = event.pathParameters?.sensor_id;
 
   if (!sensor_id) {
     return {

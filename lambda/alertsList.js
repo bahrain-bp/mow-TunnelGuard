@@ -5,6 +5,7 @@ const ALERTS_TABLE = process.env.ALERTS_TABLE;
 exports.handler = async () => {
   const params = {
     TableName: ALERTS_TABLE,
+    ProjectionExpression: "alert_id, created_at, tunnel_id, type, acknowledged", // Specify the attributes you want to retrieve
     Limit: 50, // Optional limit
     ScanIndexForward: true // optional: to get newest first
   };

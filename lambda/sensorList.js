@@ -13,6 +13,10 @@ exports.handler = async (event) => {
         ExpressionAttributeValues: {
             ':tunnel_id': tunnel_id,
         },
+        ProjectionExpression: 'sensor_id, threshhold_settings, #t',
+        ExpressionAttributeNames: {
+            "#t": "type",
+        },
 
     };
 
