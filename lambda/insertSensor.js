@@ -4,10 +4,19 @@ const { v7: uuidv7 } = require('uuid');
 
 
 exports.handler = async (event) => {
+    const body = JSON.parse(event.body || '{}');
+    
     const sensor_id = uuidv7(); // Generate a new UUID for the tunnel_id
-    const tunnel_id = event.tunnel_id; // Get tunnel_id from the event
-    const threshhold_settings = event.threshhold_settings || {Medium: 0, High: 0}; // Default to empty object if not provided
-    const type = event.type; // Default to "Unknown" if not provided
+    const tunnel_id = event.pathParameters?.tunnel_id; // Get tunnel_id from the event
+    const threshhold_settings = body.threshhold_settings || {Medium: 0, High: 0}; // Default to empty object if not provided
+    const type = body.type;
+
+    if (!tunnel_id || !type) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'Missing required fields' }),
+        };
+    }
 
     const params = {
         TableName: 'Sensors',

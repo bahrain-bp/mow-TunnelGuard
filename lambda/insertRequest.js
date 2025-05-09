@@ -4,13 +4,20 @@ const { v7: uuidv7 } = require('uuid');
 
 
 exports.handler = async (event) => {
+    const body = JSON.parse(event.body || '{}');
+    if (!body.description) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'Missing required fields' }),
+        };
+    }
     const request_id = uuidv7(); // Generate a new UUID for the request_id
     const created_at = new Date().toISOString(); // Current date and time in ISO format
-    const description = event.description; // Get description from the event
+    const description = body.description; // Get description from the event
     const acknowledged = false; // Default value for acknowledged
     const acknowledged_by = null; // Default value for acknowledged_by
     const acknowledged_at = null; // Default value for acknowledged_at
-    const actions = event.actions || []; // Default to empty array if not provided
+    const actions = body.actions || []; // Default to empty array if not provided
 
     const params = {
         TableName: 'Requests',

@@ -4,11 +4,12 @@ const REQUESTS_TABLE = process.env.REQUESTS_TABLE;
 
 exports.handler = async (event) => {
   const request_id = event.pathParameters?.requestId;
+  const created_at = event.pathParameters?.created_at;
 
-  if (!request_id) {
+  if (!request_id || !created_at) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'Missing request_id' }),
+      body: JSON.stringify({ error: 'Missing request_id, or created_at' }),
     };
   }
 
@@ -16,6 +17,7 @@ exports.handler = async (event) => {
     TableName: REQUESTS_TABLE,
     Key: {
       request_id,
+      created_at,
     },
   };
 

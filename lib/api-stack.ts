@@ -77,13 +77,15 @@ export class APIStack extends cdk.Stack {
 
     //Testing Lambdas
 
-    
+    //Insert Tunnel Lambda function to insert new tunnel into DynamoDB
     const insertTunnels = new lambda.Function(this, 'insertTunnels', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'insertTunnel.handler',
       code: lambda.Code.fromAsset('lambda')
     });
 
+
+    //Insert Sensor Lambda function to insert new sensor into DynamoDB
     const insertSensors = new lambda.Function(this, 'insertSensors', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'insertSensor.handler',
@@ -91,6 +93,7 @@ export class APIStack extends cdk.Stack {
       
     });
 
+    //Insert Sensor Reading Lambda function to insert new sensor reading into DynamoDB
     const insertSensorReadings = new lambda.Function(this, 'insertSensorReadings', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'insertSensorReading.handler',
@@ -100,6 +103,8 @@ export class APIStack extends cdk.Stack {
     dbStack.tunnelsTable.grantReadWriteData(insertTunnels); // Grant permissions to the Lambda function
     dbStack.sensorsTable.grantReadWriteData(insertSensors); // Grant permissions to the Lambda function
     dbStack.sensorReadingsTable.grantReadWriteData(insertSensorReadings); // Grant permissions to the Lambda function
+
+    //
 
     //Lambda Function to Get Detail and List View of Tunnels Table
     //List View Lambda for tunnels
@@ -129,6 +134,8 @@ export class APIStack extends cdk.Stack {
     //Tunnels List View
     const tunnels = api.root.addResource("tunnels");
     tunnels.addMethod("GET", new apigateway.LambdaIntegration(tunnelListLambda)); // GET /tunnels
+    //Insert Tunnel Api Gateway
+    tunnels.addMethod("POST", new apigateway.LambdaIntegration(insertTunnels)); // POST /tunnels
     //Tunnels Detail View
     const tunnelId = tunnels.addResource("{tunnelId}");
     tunnelId.addMethod("GET", new apigateway.LambdaIntegration(tunnelDetailLambda)); // GET /tunnels/{tunnelId}
@@ -161,6 +168,8 @@ export class APIStack extends cdk.Stack {
     //Sensors List View
     const sensors = tunnelId.addResource('sensors');
     sensors.addMethod('GET', new apigateway.LambdaIntegration(sensorListLambda)); // GET /tunnels/{tunnel_id}/sensors
+    //Insert Sensor Api Gateway
+    sensors.addMethod("POST", new apigateway.LambdaIntegration(insertSensors)); // POST /tunnels/{tunnel_id}/sensors
     //Sensors Detail View
     const sensorRoot = api.root.addResource('sensors');
     const sensorId = sensorRoot.addResource("{sensorId}");
@@ -252,8 +261,8 @@ export class APIStack extends cdk.Stack {
     const alerts = api.root.addResource("alerts");
     alerts.addMethod("GET", new apigateway.LambdaIntegration(alertsListLambda)); // GET /alerts
 
-    const alertDetail = alerts.addResource("{alertId}");
-    alertDetail.addMethod("GET", new apigateway.LambdaIntegration(alertsDetailLambda)); // GET /alerts/{alertId}
+    const alertDetail = alerts.addResource("{alertId}").addResource("{created_at}");
+    alertDetail.addMethod("GET", new apigateway.LambdaIntegration(alertsDetailLambda)); // GET /alerts/{alertId}/{created_at}
 
     //Requests List View
     const requestsListLambda = new lambda.Function(this, "RequestsListLambda", {
@@ -282,9 +291,128 @@ export class APIStack extends cdk.Stack {
 
     requests.addMethod("GET", new apigateway.LambdaIntegration(requestsListLambda)); // GET /requests
 
-    const requestDetail = requests.addResource("{requestId}");
-    requestDetail.addMethod("GET", new apigateway.LambdaIntegration(requestsDetailLambda)); // GET /requests/{requestId}
+    const requestDetail = requests.addResource("{requestId}").addResource("{created_at}");
+    requestDetail.addMethod("GET", new apigateway.LambdaIntegration(requestsDetailLambda)); // GET /requests/{requestId}/{created_at}
 
+    // Update Data Lambda function to update data in DynamoDB
+    const updateTunnelLambda = new lambda.Function(this, "UpdateTunnelLambda", {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: "updateTunnel.handler",
+      code: lambda.Code.fromAsset("lambda"),
+      environment: {
+        TUNNELS_TABLE: dbStack.tunnelsTable.tableName,
+      },
+    });
+
+    // Grant permissions for Lambda function to update data in DynamoDB
+    dbStack.tunnelsTable.grantReadWriteData(updateTunnelLambda);
+
+    // Create the API Gateway for updating data
+    tunnelId.addMethod("PUT", new apigateway.LambdaIntegration(updateTunnelLambda)); // PUT /tunnels/{tunnelId}
+
+    // Update Sensor Lambda function to update data in DynamoDB
+    const updateSensorLambda = new lambda.Function(this, "UpdateSensorLambda", {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: "updateSensor.handler",
+      code: lambda.Code.fromAsset("lambda"),
+      environment: {
+        SENSORS_TABLE: dbStack.sensorsTable.tableName,
+      },
+    });
+    // Grant permissions for Lambda function to update data in DynamoDB
+    dbStack.sensorsTable.grantReadWriteData(updateSensorLambda);
+    // Create the API Gateway for updating data
+    sensorId.addMethod("PUT", new apigateway.LambdaIntegration(updateSensorLambda)); // PUT /sensors/{sensorId}
+
+    // Update Alert Lambda function to update data in DynamoDB
+    const updateAlertLambda = new lambda.Function(this, "UpdateAlertLambda", {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: "updateAlert.handler",
+      code: lambda.Code.fromAsset("lambda"),
+      environment: {
+        ALERTS_TABLE: dbStack.alertsTable.tableName,
+      },
+    });
+    // Grant permissions for Lambda function to update data in DynamoDB
+    dbStack.alertsTable.grantReadWriteData(updateAlertLambda);
+    // Create the API Gateway for updating data
+    alertDetail.addMethod("PUT", new apigateway.LambdaIntegration(updateAlertLambda)); // PUT /alerts/{alertId}/{created_at}
+
+    // Insert Alert Lambda function to insert new alert into DynamoDB
+    const insertAlertLambda = new lambda.Function(this, "InsertAlertLambda", {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: "insertAlert.handler",
+      code: lambda.Code.fromAsset("lambda"),
+      environment: {
+        ALERTS_TABLE: dbStack.alertsTable.tableName,
+      },
+    });
+    // Grant permissions for Lambda function to insert new alert into DynamoDB
+    dbStack.alertsTable.grantReadWriteData(insertAlertLambda);
+
+    insertAlertLambda.grantInvoke(new iam.ServicePrincipal("lambda.amazonaws.com")); // Grant invoke permissions to the Lambda function
+
+    // Update Request Lambda function to update data in DynamoDB
+    const updateRequestLambda = new lambda.Function(this, "UpdateRequestLambda", {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: "updateRequest.handler",
+      code: lambda.Code.fromAsset("lambda"),
+      environment: {
+        REQUESTS_TABLE: dbStack.requestsTable.tableName,
+      },
+    });
+    // Grant permissions for Lambda function to update data in DynamoDB
+    dbStack.requestsTable.grantReadWriteData(updateRequestLambda);
+    // Create the API Gateway for updating data
+    requestDetail.addMethod("PUT", new apigateway.LambdaIntegration(updateRequestLambda)); // PUT /requests/{requestId}/{created_at}
+
+    // Insert Request Lambda function to insert new request into DynamoDB
+    const insertRequestLambda = new lambda.Function(this, "InsertRequestLambda", {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: "insertRequest.handler",
+      code: lambda.Code.fromAsset("lambda"),
+      environment: {
+        REQUESTS_TABLE: dbStack.requestsTable.tableName,
+      },
+    });
+    // Grant permissions for Lambda function to insert new request into DynamoDB
+    dbStack.requestsTable.grantReadWriteData(insertRequestLambda);
+    insertRequestLambda.grantInvoke(new iam.ServicePrincipal("lambda.amazonaws.com")); // Grant invoke permissions to the Lambda function
+
+    // Create the API Gateway for inserting new request
+    requests.addMethod("POST", new apigateway.LambdaIntegration(insertRequestLambda)); // POST /requests
+
+
+    //Delete Tunnel Cascade Senor Lambda function to delete tunnel and its sensors from DynamoDB
+    const deleteTunnelCascadeSensorsLambda = new lambda.Function(this, 'DeleteTunnelCascadeSensorsLambda', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'deleteTunnelCascadeSensors.handler',
+      code: lambda.Code.fromAsset('lambda'),
+      environment: {
+        TUNNELS_TABLE: dbStack.tunnelsTable.tableName,
+        SENSORS_TABLE: dbStack.sensorsTable.tableName,
+      },
+    });
+
+    // Grant permissions for Lambda function to delete tunnel and its sensors from DynamoDB
+    dbStack.tunnelsTable.grantReadWriteData(deleteTunnelCascadeSensorsLambda);
+    dbStack.sensorsTable.grantReadWriteData(deleteTunnelCascadeSensorsLambda);
+    // Create the API Gateway for deleting tunnel and its sensors
+    tunnelId.addMethod("DELETE", new apigateway.LambdaIntegration(deleteTunnelCascadeSensorsLambda)); // DELETE /tunnels/{tunnelId}
+
+    //Delete Sensor Lambda function to delete sensor from DynamoDB
+    const deleteSensorLambda = new lambda.Function(this, 'DeleteSensorLambda', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'deleteSensor.handler',
+      code: lambda.Code.fromAsset('lambda'),
+      environment: {
+        SENSORS_TABLE: dbStack.sensorsTable.tableName,
+      },
+    });
+    // Grant permissions for Lambda function to delete sensor from DynamoDB
+    dbStack.sensorsTable.grantReadWriteData(deleteSensorLambda);
+    // Create the API Gateway for deleting sensor
+    sensorId.addMethod("DELETE", new apigateway.LambdaIntegration(deleteSensorLambda)); // DELETE /sensors/{sensorId}
 
   }
 }
