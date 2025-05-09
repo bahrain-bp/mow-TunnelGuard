@@ -4,10 +4,18 @@ const { v7: uuidv7 } = require('uuid');
 
 
 exports.handler = async (event) => {
+    const body = JSON.parse(event.body || '{}');
+    if (!body.name || !body.location || body.threshhold === undefined) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'Missing required fields' }),
+        };
+    }
+
     const tunnel_id = uuidv7(); // Generate a new UUID for the tunnel_id
-    const name = event.name;
-    const location = event.location;
-    const threshhold = event.threshhold;
+    const name = body.name;
+    const location = body.location;
+    const threshhold = body.threshhold;
     const status = "Safe"; // Default value for tunnelStatus
     const last_status_time = new Date().toISOString(); // Current date and time in ISO format
     const barrier_state = false; // Default value for tunnelBarrierStatus

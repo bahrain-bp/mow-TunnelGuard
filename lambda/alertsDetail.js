@@ -3,12 +3,13 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 const ALERTS_TABLE = process.env.ALERTS_TABLE;
 
 exports.handler = async (event) => {
-  const alert_id = event.pathParameters?.alertId;
+  const alert_id = event.pathParameters?.alert_id;
+  const created_at = event.pathParameters?.created_at;
 
-  if (!alert_id) {
+  if (!alert_id || !created_at) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'Missing alert_id' }),
+      body: JSON.stringify({ error: 'Missing alert_id or created_at' }),
     };
   }
 
@@ -16,6 +17,7 @@ exports.handler = async (event) => {
     TableName: ALERTS_TABLE,
     Key: {
       alert_id,
+      created_at
     },
   };
 
