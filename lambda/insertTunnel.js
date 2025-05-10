@@ -8,6 +8,9 @@ exports.handler = async (event) => {
     if (!body.name || !body.location || body.threshhold === undefined) {
         return {
             statusCode: 400,
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+              },
             body: JSON.stringify({ error: 'Missing required fields' }),
         };
     }
@@ -37,6 +40,11 @@ exports.handler = async (event) => {
         await dynamoDb.put(params).promise();
         return {
             statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*', // Or 'https://yourfrontend.com'
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'POST,OPTIONS'
+              },
             body: JSON.stringify({ message: 'Tunnel inserted successfully!' }),
         };
     } catch (error) {
