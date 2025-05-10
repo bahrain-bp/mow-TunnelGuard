@@ -123,12 +123,16 @@ export class APIStack extends cdk.Stack {
       code: lambda.Code.fromAsset("lambda"),
       environment: {
         TUNNELS_TABLE: dbStack.tunnelsTable.tableName,
+        SENSORS_TABLE: dbStack.sensorsTable.tableName,
+        SENSOR_READINGS_TABLE: dbStack.sensorReadingsTable.tableName,
       },
     });
 
     // Grant permissions for Lambda functions to interact with DynamoDB
     dbStack.tunnelsTable.grantReadData(tunnelListLambda);
     dbStack.tunnelsTable.grantReadData(tunnelDetailLambda);
+    dbStack.sensorsTable.grantReadData(tunnelDetailLambda);
+    dbStack.sensorReadingsTable.grantReadData(tunnelDetailLambda);
 
     // Create the API Gateway for Tunnels
     //Tunnels List View
