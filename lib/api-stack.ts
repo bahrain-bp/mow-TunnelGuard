@@ -104,6 +104,12 @@ export class APIStack extends cdk.Stack {
     dbStack.sensorsTable.grantReadWriteData(insertSensors); // Grant permissions to the Lambda function
     dbStack.sensorReadingsTable.grantReadWriteData(insertSensorReadings); // Grant permissions to the Lambda function
 
+    // Grant permissions for Lambda function to interact with DynamoDB
+    insertSensorReadings.addPermission('IoTInvokePermission', {
+      principal: new iam.ServicePrincipal('iot.amazonaws.com'),
+      sourceArn: `arn:aws:iot:${this.region}:${this.account}:rule/apirule`
+    });
+
     //
 
     //Lambda Function to Get Detail and List View of Tunnels Table
@@ -205,6 +211,9 @@ export class APIStack extends cdk.Stack {
     // Create the API Gateway for Sensor Readings
     const readings = sensorId.addResource("readings");
     readings.addMethod("GET", new apigateway.LambdaIntegration(sensorReadingsListLambda)); // GET /sensors/{sensorId}/readings
+
+    //Insert Sensor Reading Api Gateway
+    readings.addMethod("POST", new apigateway.LambdaIntegration(insertSensorReadings)); // POST /sensors/{sensorId}/readings
 
     const readingDetail = readings.addResource("{read_at}");
     readingDetail.addMethod("GET", new apigateway.LambdaIntegration(sensorReadingsDetailLambda)) // GET /sensors/{sensorId}/readings/{read_at}
